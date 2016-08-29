@@ -5,9 +5,9 @@ import math
 
 # Data
 CapacidadRAM = 100
-NumeroDeCPU = 1
+NumeroDeCPU = 2
 random.seed(24)  # Semilla
-NumProcesos = 150  # Cantidad de procesos
+NumProcesos = 200  # Cantidad de procesos
 Interval = 1  # Intervalo de creacion de procesos
 InstruccionesPorCiclo = 3  # Cuantas instrucciones realiza el CPU por unidad de tiempo
 TiempoOperacionInOut = 5  # Tiempo de operacion I/O
