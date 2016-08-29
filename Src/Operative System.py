@@ -5,17 +5,17 @@ import math
 
 # Data
 CapacidadRAM = 100
-NumeroDeCPU = 10
-random.seed(24)
-NumProcesos = 25
-Interval = 5
-InstruccionesPorCiclo = 3
-TiempoOperacionInOut = 5
-TiemposDeProcesos = []
+NumeroDeCPU = 1
+random.seed(24)  # Semilla
+NumProcesos = 25  # Cantidad de procesos
+Interval = 10  # Intervalo de creacion de procesos
+InstruccionesPorCiclo = 3  # Cuantas instrucciones realiza el CPU por unidad de tiempo
+TiempoOperacionInOut = 5  # Tiempo de operacion I/O
+TiemposDeProcesos = []  # Lista para almacenar tiempos
 
 
 class SistemaOperativo:
-    """Es el ambiente del sistema operativo"""
+    """Es el ambiente del sistema operativo, crea la RAM y los CPU"""
 
     def __init__(self, env):
         self.RAM = simpy.Container(env, init=CapacidadRAM, capacity=CapacidadRAM)
@@ -23,22 +23,24 @@ class SistemaOperativo:
 
 
 class Proceso:
-    """La clase Proceso modela el funcionamiento de un proceso"""
+    """La clase Proceso modela el funcionamiento de un proceso en la computadora"""
 
-    def __init__(self, id, no, env, cpu):
+    def __init__(self, id, no, env, sistema_operativo):
+        # Atributos
         self.id = id
         self.no = no
         self.instrucciones = random.randint(1, 10)
         self.memoriaRequerida = random.randint(1, 10)
         self.env = env
         self.terminated = False
-        self.cpu = cpu
+        self.sistema_operativo = sistema_operativo
         self.createdTime = 0
         self.finishedTime = 0
         self.totalTime = 0
-        self.proceso = env.process(self.procesar(env, cpu))
+        self.proceso = env.process(self.procesar(env, sistema_operativo))
 
-    def procesar(self, env, cpu):
+    # Metodos
+    def procesar(self, env, sistema_operativo):
         inicio = env.now
         self.createdTime = inicio
         print('%s: Creado en %d' % (self.id, inicio))  # El proceso se crea en ese momento
@@ -78,22 +80,32 @@ class Proceso:
         TiemposDeProcesos.insert(self.no, self.totalTime)
 
 
+# Generador de procesos
 def proceso_generator(env, sistema_operativo):
     for i in range(NumProcesos):
-        tiempoCreacion = random.expovariate(1.0/Interval)
+        tiempo_creacion = random.expovariate(1.0/Interval)
         Proceso('Proceso %d' % i, i, env, sistema_operativo)
-        yield env.timeout(tiempoCreacion)  # Tiempo que tardara en aparecer cada uno
+        yield env.timeout(tiempo_creacion)  # Tiempo que tardara en aparecer cada uno
 
 
-env = simpy.Environment()
-sistema_operativo = SistemaOperativo(env)
-pro_generator = env.process(proceso_generator(env, sistema_operativo))
-env.run()
+# Main
+class Main:
+    """Esta clase se encarga de crear los objetos para la simulacion"""
+    def __init__(self):
+        env = simpy.Environment()  # Creaar ambiente
+        sistema_operativo = SistemaOperativo(env)  # Crear sistema operativo (recursos)
+        env.process(proceso_generator(env, sistema_operativo))  # Crear procesos
+        env.run()
+
+        # Calcular estadisticas de tiempo
+        def promedio(s): return sum(s) * 1.0 / len(s)
+
+        tiempo_promedio_total = promedio(TiemposDeProcesos)  # Obtener Promedio
+        varianza_tiempo_total = map(lambda x: (x - tiempo_promedio_total) ** 2, TiemposDeProcesos)  # Obtener Varianza
+        desvest_tiempo_total = math.sqrt(promedio(varianza_tiempo_total))  # Calcular la desviacion estandar
+
+        print "El promedio de tiempo es de: ", tiempo_promedio_total, ", y su desviacion estandar es de: ", \
+            desvest_tiempo_total
 
 
-def promedio(s): return sum(s) * 1.0 / len(s)
-tiempoPromedioTotal = promedio(TiemposDeProcesos)  # Obtener Promedio
-varianzaTiempoTotal = map(lambda x: (x - tiempoPromedioTotal)**2, TiemposDeProcesos)  # Obtener Varianza
-desVestTiempoTotal = math.sqrt(promedio(varianzaTiempoTotal))
-
-print "El promedio de tiempo es de: ", tiempoPromedioTotal, ", y su desviacion estandar es de: ", desVestTiempoTotal
+Main()  # Correr
