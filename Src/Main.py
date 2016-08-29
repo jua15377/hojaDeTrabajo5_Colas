@@ -9,40 +9,51 @@ import sys
 import simpy
 import random
 
+#clasle prooceso
+class Proceso:
+#constructtor
+    def __init__(self,env,identificador):
+        self.identificador = identificador
+        self.env = env
+        self.cantDeMemoria = self.setCantDeMemoria()
+        self.cantDeInstrucciones = self.setCantDeIntrucciones()
+        self.instructionsCPU = 0
+        self.Terminated = False
+    def setCantDeMemoria(self):
+        self.cantDeMemoria = random.randint(1,10)
 
-# objeto de S.O.
+    def setCantDeIntrucciones(self):
+        self.cantDeInstrucciones = random.randint(1,10)
+    #ejecucion del proceso
+    def ejecutar(self,instrucARealizar):
+        self.instructionsCPU = instrucARealizar
+        self.cantDeInstrucciones = self.cantDeInstrucciones - self.instructionsCPU
+        if self.cantDeInstrucciones <= 0:
+            return 0
+        return self.cantDeInstrucciones
 
-class SistemaOperativo:
-    def __init__(self, env, memoria, capacidad, procesador,velocidad):
-        self.procesador = simpy.Resource(env,capacidad)
-        self.memoria = simpy.Container(env, memoria, memoria)
-        self.velocida = velocidad
+    def setTerminated(self,estado):
+        self.Terminated = estado
+        if estado == True:
+            print ("Proceso %s terminado" %self.identificador)
 
-class Procesos:
-    def __init__(self, memAsignada, id):
-        self.tamanioProceso = random.randint(1,10)
-        self.cantidadDeInstrucciones = random.randint(1,10)
-        self.memoriaAsignada = memAsignada
-        self.identificacion = id
+class Computadora:
+    def __init__(self, env):
+        self.procesarores = simpy.Resource(env, capacity=1)
+        self.ram = simpy.Container(env, init=100, capacity=100)
 
-
-    def ejecutar(self):
-        print ("Proeso ejecutandose")
-        print ("Esperando memoria para el proceso ")
-        yield self.env.timeout(1)
-        yield (self.memoria)  # Solicitar memoria ram
-        yield self.env.timeout(1)
-        print ("Proceso '{0}' memoria alocada en: {1} "
-        yield self.env.timeout(2)
-
-
-def main(argv):
-    so = SistemaOperativo()
-    env = simpy.Environment()
-
-    env.run()
+class SitemaOperativo:
+    def __init__(self, env, recursos, proceso):
+        self.resources = recursos
+        self.process = proceso
 
 
-# Funcion main
-if __name__ == "__main__":
-    main(sys.argv)
+
+
+
+
+
+
+
+
+
