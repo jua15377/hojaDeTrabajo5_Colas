@@ -5,7 +5,11 @@
 *.elf
 
 # HojaActual
-HojaTrabajo04.pdf
+HojaTrabajo05.pdf
+ejem1SimPy.py
+ejemplo1.py
+ejemplo2.py
+ejemplo3.py
 
 # Precompiled Headers
 *.gch
