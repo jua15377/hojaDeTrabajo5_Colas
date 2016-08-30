@@ -3,6 +3,13 @@ import simpy
 import random
 import math
 
+
+# Eric Mendoza, carnet 15002
+# Jonnathan Juarez, carnet 15377
+# 23 de Agosto del 2016
+# Descripcion: Simulacion de un sistema operativo
+# utilizando Sympy
+#
 # Data
 CapacidadRAM = 100
 NumeroDeCPU = 2
